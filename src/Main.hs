@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-|
-Module      : LexerGen
+Module      : ALexerGen
 Description : Lexer spec generator
 Copyright   : (c) Josh Findon and Edward Jones, 2019
 License     : MIT
