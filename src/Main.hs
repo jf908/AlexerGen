@@ -22,6 +22,8 @@ import           Data.Maybe           (fromMaybe)
 import           Data.Semigroup       (Semigroup, (<>))
 import           GHC.Generics         (Generic)
 import           Prelude              hiding (shows)
+import           System.Environment   (getArgs)
+import           System.Exit          (die)
 
 type LexerData = Map String TokenData
 
@@ -53,25 +55,19 @@ instance Monoid GeneratedLexer where
     mempty = GeneratedLexer [] [] [] [] []
     mappend = (<>)
 
-startFile :: FilePath
-startFile = "SpadeLexer.x.start"
-
-endFile :: FilePath
-endFile = "SpadeLexer.x.end"
-
-jsonFile :: FilePath
-jsonFile = "SpadeLexer.x.json"
-
 main :: IO ()
 main = do
-    d <- (eitherDecode' <$> B.readFile jsonFile) :: IO (Either String LexerData)
-    case d of
-        Left err -> putStrLn err
-        Right ps -> do
-            start <- readFile startFile
-            end <- readFile endFile
-            putStrLn $ lexerToText start end (makeLexer ps)
-
+    args <- getArgs
+    case args of
+        [jsonFile, startFile, endFile] -> do
+            d <- (eitherDecode' <$> B.readFile jsonFile) :: IO (Either String LexerData)
+            case d of
+                Left err -> putStrLn err
+                Right ps -> do
+                    start <- readFile startFile
+                    end <- readFile endFile
+                    putStrLn $ lexerToText start end (makeLexer ps)
+        _ -> die "Must have at least 3 arguments"
 
 lexerToText :: String -> String -> GeneratedLexer -> String
 lexerToText start end lexer =
