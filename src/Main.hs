@@ -38,6 +38,21 @@ data TokenData =
 
 instance FromJSON TokenData
 
+data GeneratedLexer = GeneratedLexer {
+    captureLines  :: [String],
+    classes       :: [String],
+    classToTokens :: [String],
+    tokens        :: [String],
+    shows         :: [String]
+}
+
+instance Semigroup GeneratedLexer where
+    (GeneratedLexer a b c d e) <> (GeneratedLexer a' b' c' d' e') = GeneratedLexer (a <> a') (b <> b') (c <> c') (d <> d') (e <> e')
+
+instance Monoid GeneratedLexer where
+    mempty = GeneratedLexer [] [] [] [] []
+    mappend = (<>)
+
 startFile :: FilePath
 startFile = "SpadeLexer.x.start"
 
@@ -91,15 +106,6 @@ lexerToText start end lexer =
                     , ""
                 ]
 
-
-strRepl :: Char -> String -> String -> String
-strRepl c s s' = foldl (++) "" $ repl <$> s'
-    where
-        repl :: Char -> String
-        repl x
-            | x == c    = s
-            | otherwise = [x]
-
 makeLexer :: LexerData -> GeneratedLexer
 makeLexer d = foldl (<>) mempty $ makeLexer' <$> toList d
     where
@@ -117,18 +123,10 @@ makeLexer d = foldl (<>) mempty $ makeLexer' <$> toList d
                 fromMaybeEmpty = fromMaybe ""
                 sanitize = (strRepl '{' "Left brace") . (strRepl '}' "Right brace")
 
-
-data GeneratedLexer = GeneratedLexer {
-    captureLines  :: [String],
-    classes       :: [String],
-    classToTokens :: [String],
-    tokens        :: [String],
-    shows         :: [String]
-}
-
-instance Semigroup GeneratedLexer where
-    (GeneratedLexer a b c d e) <> (GeneratedLexer a' b' c' d' e') = GeneratedLexer (a <> a') (b <> b') (c <> c') (d <> d') (e <> e')
-
-instance Monoid GeneratedLexer where
-    mempty = GeneratedLexer [] [] [] [] []
-    mappend = (<>)
+strRepl :: Char -> String -> String -> String
+strRepl c s s' = foldl (++) "" $ repl <$> s'
+    where
+        repl :: Char -> String
+        repl x
+            | x == c    = s
+            | otherwise = [x]
