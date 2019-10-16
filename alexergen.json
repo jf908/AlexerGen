@@ -9,8 +9,8 @@
 	"date": "16 Oct 2019",
 	"examples": [
 		{
-			"input": "alexergen < ./Lexer.x.json > ./Lexer.x",
-			"description": "Translate Lexer.x.json in to lexer spec Lexer.x"
+			"input": "alexergen ./Lexer.x.json ./Lexer.x.start ./Lexer.x.end > ./Lexer.x",
+			"description": "Translate Lexer.x.json in to lexer spec Lexer.x which starts with Lexer.x.start and ends with Lexer.x.end. This is useful for sorting out the Haskell-headers"
 		}
 	],
 	"seeAlso": [
