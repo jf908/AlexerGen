@@ -43,7 +43,7 @@ build-type:         Simple
 
 -- Extra files to be distributed with the package, such as examples or a
 -- README.
-extra-source-files: README.md, Makefile, LICENSE, spade.json
+extra-source-files: README.md, LICENSE, alexergen.json
 
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:      >=1.10
@@ -55,13 +55,13 @@ source-repository head
 
 executable alexergen
     -- .hs or .lhs file containing the Main module.
-    main-is:        LexerGen.hs
+    main-is:        Main.hs
 
     -- Compiler flags
     ghc-options:    -Wall -Wextra -Werror -O2
 
     -- Directories containing source files.
-    hs-source-dirs: ./src/Language/
+    hs-source-dirs: ./src/
 
     -- Modules included in this executable, other than Main.
     other-modules:
