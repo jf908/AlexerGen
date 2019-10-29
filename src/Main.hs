@@ -93,8 +93,8 @@ lexerToText start end lexer =
                     , ""
                     , "-- | Type to represent tokens in the output stream"
                     , "data Token = " ++ intercalate "\n\t\t| " (tokens lexer')
-                    , "\t| TEoF -- ^ @\\0@"
-                    , "\t deriving (Eq, Ord)"
+                    , "\t\t| TEoF -- ^ @\\0@"
+                    , "\tderiving (Eq, Ord)"
                     , ""
                     , "instance Show Token where"
                     , '\t' : intercalate "\n\t" (shows lexer')
