@@ -35,7 +35,9 @@ data TokenData =
         comment         :: Maybe String,
         extraFields     :: Maybe String,
         showExtraFields :: Maybe String,
-        showBody        :: Maybe String
+        showBody        :: Maybe String,
+        state           :: Maybe String,
+        beginState      :: Maybe String
     } deriving (Show, Generic)
 
 instance FromJSON TokenData
@@ -107,7 +109,8 @@ makeLexer d = foldl (<>) mempty $ makeLexer' <$> toList d
     where
         makeLexer' :: (String, TokenData) -> GeneratedLexer
         makeLexer' (name, td) = GeneratedLexer {
-            captureLines = [ quotify td ++ " { mkL L" ++ name ++ " }" ]
+            captureLines = [ (formatState $ state td) ++ quotify td ++ " { " ++ action ++ " }" ]
+            -- captureLines = [ (formatState $ state td) ++ quotify td ++ " { mkL L" ++ name ++ " }" ]
             , classes = [ 'L' : name ]
             , classToTokens = [ 'L' : name ++ " -> return (T" ++ name ++ ' ' : fromMaybeEmpty (tokenValue td) ++ " p)" ]
             , tokens = [ 'T' : name ++ " { " ++ fromMaybeEmpty ((++ ",") <$> extraFields td) ++ "position :: AlexPosn } -- ^ " ++ (sanitize $ fromMaybe ('@' : toLiteral td ++ "@") (comment td)) ]
@@ -118,6 +121,11 @@ makeLexer d = foldl (<>) mempty $ makeLexer' <$> toList d
                 quotify td' = if head (lexeme td') == '@' then lexeme td' else '"' : lexeme td' ++ "\""
                 fromMaybeEmpty = fromMaybe ""
                 sanitize = (strRepl '{' "Left brace") . (strRepl '}' "Right brace")
+                formatState Nothing  = ""
+                formatState (Just s) = '<' : s ++ ">"
+                action = case beginState td of
+                    Nothing -> "mkL L" ++ name
+                    Just s  -> "begin " ++ s
 
 strRepl :: Char -> String -> String -> String
 strRepl c s s' = foldl (++) "" $ repl <$> s'
