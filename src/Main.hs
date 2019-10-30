@@ -16,7 +16,7 @@ module Main (main) where
 
 import           Data.Aeson           (FromJSON, eitherDecode')
 import qualified Data.ByteString.Lazy as B (readFile)
-import           Data.List            (intercalate)
+import           Data.List            (intercalate, sortOn)
 import           Data.Map             (Map, toList)
 import           Data.Maybe           (fromMaybe)
 import           Data.Semigroup       (Semigroup, (<>))
@@ -37,7 +37,8 @@ data TokenData =
         showExtraFields :: Maybe String,
         showBody        :: Maybe String,
         state           :: Maybe String,
-        beginState      :: Maybe String
+        beginState      :: Maybe String,
+        precedence      :: Maybe Int
     } deriving (Show, Generic)
 
 instance FromJSON TokenData
@@ -105,7 +106,7 @@ lexerToText start end lexer =
                 ]
 
 makeLexer :: LexerData -> GeneratedLexer
-makeLexer d = foldl (<>) mempty $ makeLexer' <$> toList d
+makeLexer d = foldl (<>) mempty $ makeLexer' <$> (sortOn (\(_,x) -> -(fromMaybe 0 $ precedence x)) $ toList d)
     where
         makeLexer' :: (String, TokenData) -> GeneratedLexer
         makeLexer' (name, td) = GeneratedLexer {
